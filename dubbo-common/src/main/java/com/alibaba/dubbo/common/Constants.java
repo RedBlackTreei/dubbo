@@ -398,6 +398,38 @@ public class Constants {
     public static final String MERGER_KEY = "merger";
 
     /**
+     * invoker是否连接的，针对RegistryDirectory Join的Invoker有意义。没有连接Invoker的INSIDE_INVOKERS不会更新。
+     */
+    public static final String INVOKER_CONNECTED_KEY               = "connected";
+
+    /**
+     * 内部invoker，组合的Invoker
+     */
+    public static final String INVOKER_INSIDE_INVOKERS_KEY         = "inside.invokers";
+
+    /**
+     * 内部invoker数，组合的Invoker
+     */
+    public static final String INVOKER_INSIDE_INVOKER_COUNT_KEY    = "inside.invoker.count";
+
+    /**
+     * Switch cluster
+     * see SwitchCluster
+     */
+    public static final String CLUSTER_SWITCH_FACTOR               = "cluster.switch.factor";
+
+    /**
+     * log error when Switch cluster
+     * see SwitchCluster
+     */
+    public static final String CLUSTER_SWITCH_LOG_ERROR            = "cluster.switch.log.error";
+
+    /**
+     * default Switch cluster factor
+     */
+    public static final double DEFAULT_CLUSTER_SWITCH_FACTOR       = 2;
+
+    /**
      * 集群时是否排除非available的invoker
      */
     public static final String CLUSTER_AVAILABLE_CHECK_KEY = "cluster.availablecheck";

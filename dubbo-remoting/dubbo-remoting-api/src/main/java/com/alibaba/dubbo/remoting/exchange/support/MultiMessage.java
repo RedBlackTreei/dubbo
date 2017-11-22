@@ -25,14 +25,8 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:gang.lvg@alibaba-inc.com">kimi</a>
- * @see com.alibaba.dubbo.remoting.transport.MultiMessageHandler
  */
 public final class MultiMessage implements Iterable {
-
-    private final List messages = new ArrayList();
-
-    private MultiMessage() {
-    }
 
     public static MultiMessage createFromCollection(Collection collection) {
         MultiMessage result = new MultiMessage();
@@ -47,6 +41,10 @@ public final class MultiMessage implements Iterable {
     public static MultiMessage create() {
         return new MultiMessage();
     }
+
+    private final List messages = new ArrayList();
+
+    private MultiMessage() {}
 
     public void addMessage(Object msg) {
         messages.add(msg);

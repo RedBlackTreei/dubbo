@@ -15,6 +15,9 @@
  */
 package com.alibaba.dubbo.remoting.transport;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
@@ -22,19 +25,20 @@ import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.serialize.Serialization;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.remoting.Channel;
-import com.alibaba.dubbo.remoting.Codec2;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
+import com.alibaba.dubbo.remoting.Codec;
 
 /**
  * AbstractCodec
- *
+ * 
  * @author william.liangf
  */
-public abstract class AbstractCodec implements Codec2 {
+public abstract class AbstractCodec implements Codec {
+	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractCodec.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCodec.class);
+    protected Serialization getSerialization(Channel channel) {
+        return CodecSupport.getSerialization(channel.getUrl());
+    }
 
     protected static void checkPayload(Channel channel, long size) throws IOException {
         int payload = Constants.DEFAULT_PAYLOAD;
@@ -42,37 +46,33 @@ public abstract class AbstractCodec implements Codec2 {
             payload = channel.getUrl().getParameter(Constants.PAYLOAD_KEY, Constants.DEFAULT_PAYLOAD);
         }
         if (payload > 0 && size > payload) {
-            IOException e = new IOException("Data length too large: " + size + ", max payload: " + payload + ", channel: " + channel);
-            logger.error(e);
+        	IOException e = new IOException("Data length too large: " + size + ", max payload: " + payload + ", channel: " + channel);
+        	logger.error(e);
             throw e;
         }
     }
 
-    protected Serialization getSerialization(Channel channel) {
-        return CodecSupport.getSerialization(channel.getUrl());
-    }
+	protected boolean isClientSide(Channel channel) {
+		String side = (String) channel.getAttribute(Constants.SIDE_KEY);
+		if ("client".equals(side)) {
+			return true;
+		} else if ("server".equals(side)) {
+			return false;
+		} else {
+			InetSocketAddress address = channel.getRemoteAddress();
+			URL url = channel.getUrl();
+			boolean client = url.getPort() == address.getPort()
+					&& NetUtils.filterLocalHost(url.getIp()).equals(
+							NetUtils.filterLocalHost(address.getAddress()
+									.getHostAddress()));
+			channel.setAttribute(Constants.SIDE_KEY, client ? "client"
+					: "server");
+			return client;
+		}
+	}
 
-    protected boolean isClientSide(Channel channel) {
-        String side = (String) channel.getAttribute(Constants.SIDE_KEY);
-        if ("client".equals(side)) {
-            return true;
-        } else if ("server".equals(side)) {
-            return false;
-        } else {
-            InetSocketAddress address = channel.getRemoteAddress();
-            URL url = channel.getUrl();
-            boolean client = url.getPort() == address.getPort()
-                    && NetUtils.filterLocalHost(url.getIp()).equals(
-                    NetUtils.filterLocalHost(address.getAddress()
-                            .getHostAddress()));
-            channel.setAttribute(Constants.SIDE_KEY, client ? "client"
-                    : "server");
-            return client;
-        }
-    }
-
-    protected boolean isServerSide(Channel channel) {
-        return !isClientSide(channel);
-    }
+	protected boolean isServerSide(Channel channel) {
+		return !isClientSide(channel);
+	}
 
 }

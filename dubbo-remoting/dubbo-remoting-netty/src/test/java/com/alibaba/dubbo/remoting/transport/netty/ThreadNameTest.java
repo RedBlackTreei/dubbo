@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2012 Alibaba Group.
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ *  
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,15 +15,15 @@
  */
 package com.alibaba.dubbo.remoting.transport.netty;
 
-import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.remoting.Channel;
-import com.alibaba.dubbo.remoting.ChannelHandler;
-import com.alibaba.dubbo.remoting.RemotingException;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.alibaba.dubbo.common.URL;
+import com.alibaba.dubbo.remoting.Channel;
+import com.alibaba.dubbo.remoting.ChannelHandler;
+import com.alibaba.dubbo.remoting.RemotingException;
 
 /**
  * @author <a href="mailto:gang.lvg@alibaba-inc.com">kimi</a>
@@ -80,13 +80,13 @@ public class ThreadNameTest {
         private boolean success;
         private boolean client;
 
+        public boolean isSuccess() {
+            return success;
+        }
+
         ThreadNameVerifyHandler(String msg, boolean client) {
             message = msg;
             this.client = client;
-        }
-
-        public boolean isSuccess() {
-            return success;
         }
 
         private void checkThreadName() {
@@ -97,29 +97,34 @@ public class ThreadNameTest {
 
         private void output(String method) {
             System.out.println(Thread.currentThread().getName()
-                    + " " + (client ? "client " + method : "server " + method));
+                                   + " " + (client ? "client " + method : "server " + method));
         }
 
+        @Override
         public void connected(Channel channel) throws RemotingException {
             output("connected");
             checkThreadName();
         }
 
+        @Override
         public void disconnected(Channel channel) throws RemotingException {
             output("disconnected");
             checkThreadName();
         }
 
+        @Override
         public void sent(Channel channel, Object message) throws RemotingException {
             output("sent");
             checkThreadName();
         }
 
+        @Override
         public void received(Channel channel, Object message) throws RemotingException {
             output("received");
             checkThreadName();
         }
 
+        @Override
         public void caught(Channel channel, Throwable exception) throws RemotingException {
             output("caught");
             checkThreadName();
